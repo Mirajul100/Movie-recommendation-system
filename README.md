@@ -1,19 +1,3 @@
-# MovieFlix — AI Movie Recommendation Website
-
-A dark, Netflix-styled movie recommendation site built on your trained
-content-based ML model (TF-IDF + cosine similarity over `new_df.pkl`,
-`indices.pkl`, `tfidf.pkl`, `tfidf_matrix.pkl`).
-
-## Why FastAPI only (no Django)
-
-You asked for "FastAPI and Django" together — running two full backend
-frameworks side by side for one app is redundant (they'd duplicate routing,
-ORM, and auth). I built the whole backend in **FastAPI**, since it's the
-natural fit for serving an ML model (native async, Pydantic validation,
-automatic docs at `/docs`) and Django would only add value here for its
-admin panel — which this app already has as a custom dashboard. If you
-specifically want Django's admin UI or ORM, say so and I'll adapt it.
-
 ## Architecture
 
 ```
