@@ -1,3 +1,4 @@
 .env
 __pycache__/
-moviebd.db
+db.sqlite3
+venv/
