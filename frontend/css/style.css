@@ -1,29 +1,3 @@
-/* ==========================================================================
-   MovieFlix stylesheet — entry point
-   ==========================================================================
-   This file doesn't hold any rules itself. It just pulls in one file per
-   section of the UI, in the order they should apply, so each part of the
-   design lives in its own easy-to-find file:
-
-     01-base.css          fonts, color variables, resets, layout shells
-     02-navbar.css         top navigation bar, search box, account menu
-     03-hero.css            the big featured-movie banner
-     04-sections-rows.css   generic "row of cards" section layout
-     05-movie-card.css       the movie poster card itself
-     06-tiles.css             genre / mood / time tiles
-     07-filters-bar.css       the filter dropdowns on the Browse page
-     08-modals.css            popup dialogs (movie detail, auth, compare)
-     09-chatbot.css           the floating AI chat widget
-     10-toast.css             little "Added to favorites" notifications
-     11-admin.css             admin dashboard
-     12-skeleton.css          loading shimmer effect
-     13-footer.css            page footer
-     14-theme-light.css       light-mode color overrides
-     15-responsive.css        small-screen adjustments
-
-   Keep this order: 14 and 15 must load last so their overrides win.
-   ========================================================================== */
-
 @import url("01-base.css");
 @import url("02-navbar.css");
 @import url("03-hero.css");
@@ -39,3 +13,4 @@
 @import url("13-footer.css");
 @import url("14-theme-light.css");
 @import url("15-responsive.css");
+@import url("16-icon.css");

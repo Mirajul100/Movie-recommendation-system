@@ -2,8 +2,8 @@
 let compareMode = "compare";
 function openCompare(mode) {
   compareMode = mode;
-  qs("#compare-heading").textContent =
-    mode === "compare" ? "⚔️ Movie Match" : "🤝 Friend Match";
+  qs("#compare-heading").innerHTML =
+    mode === "compare" ? '<i class="fa-solid fa-film"></i> Movie Match' : '<i class="fa-solid fa-user-group"></i> Friend Match';
   qs("#compare-a").placeholder =
     mode === "compare" ? "First movie title…" : "Your favorite movie…";
   qs("#compare-b").placeholder =

@@ -17,11 +17,12 @@
         <li><a href="#/genres" data-nav="genres">Genres</a></li>
         <li><a href="#/moods" data-nav="moods">Moods</a></li>
         <li><a href="#/collections" data-nav="collections">Collections</a></li>
-        <li><a href="#/my-list" data-nav="my-list">My List</a></li>
+        <li><a href="#/my-list" data-nav="my-list"> My List</a></li>
+        <script src="https://kit.fontawesome.com/d57ab9f7f9.js" crossorigin="anonymous"></script>
       </ul>
       <div class="nav-spacer"></div>
       <div class="search-wrap">
-        <span class="search-icon">⌕</span>
+        <span class="search-icon"><i class="fa-sharp fa-solid fa-magnifying-glass"></i></span>
         <input
           id="search-input"
           type="text"
@@ -32,10 +33,10 @@
       </div>
       <div class="nav-actions">
         <button class="icon-btn" id="surprise-btn" title="Surprise Me">
-          🎲
+          <i class="fa-solid fa-dice"></i>
         </button>
         <button class="icon-btn" id="theme-toggle" title="Toggle theme">
-          ☾
+          <i class="fa-regular fa-moon"></i>
         </button>
         <div id="auth-slot"></div>
       </div>
@@ -135,7 +136,7 @@
                 text-align: left;
               "
             >
-              <div class="tile-emoji">⚔️</div>
+              <div class="tile-emoji"><i class="fa-solid fa-film"></i></div>
               <div class="tile-name">Movie Match</div>
               <div class="tile-sub">Compare two movies</div>
             </button>
@@ -147,7 +148,7 @@
                 background: linear-gradient(160deg, #1f2f3d, #0f1a22);
               "
             >
-              <div class="tile-emoji">🤝</div>
+              <div class="tile-emoji"><i class="fa-solid fa-user-group"></i></div>
               <div class="tile-name">Friend Match</div>
               <div class="tile-sub">What you'll both enjoy</div>
             </button>
@@ -159,7 +160,7 @@
                 background: linear-gradient(160deg, #3d2f1f, #221a0f);
               "
             >
-              <div class="tile-emoji">📅</div>
+              <div class="tile-emoji"><i class="fa-regular fa-calendar"></i></div>
               <div class="tile-name">Daily Pick</div>
               <div class="tile-sub">One new pick, every day</div>
             </button>
@@ -171,7 +172,7 @@
                 background: linear-gradient(160deg, #3d1f2c, #220f18);
               "
             >
-              <div class="tile-emoji">🎲</div>
+              <div class="tile-emoji" , style="color: #dec887;"><i class="fa-solid fa-dice"></i></div>
               <div class="tile-name">Surprise Me</div>
               <div class="tile-sub">Random roll of the dice</div>
             </button>
@@ -190,20 +191,20 @@
         </div>
         <div class="filters-bar container">
           <span class="filters-label">Filter</span>
-          <select id="f-genre">
-            <option value="" , style="color: black;">Any genre</option>
+          <select id="f-genre" , style="color: #673AB7;">
+            <option value="">Any genre</option>
           </select>
-          <select id="f-sort">
-            <option value="popularity">Sort: Popularity</option>
-            <option value="rating">Sort: Rating</option>
-            <option value="alpha">Sort: Alphabetical</option>
+          <select id="f-sort" , style="color: #673AB7;">
+            <option value="popularity" , style="color: #673AB7;">Sort: Popularity</option>
+            <option value="rating" , style="color: #673AB7;">Sort: Rating</option>
+            <option value="alpha" , style="color: #673AB7;">Sort: Alphabetical</option>
           </select>
-          <select id="f-rating">
-            <option value="0">Any rating</option>
-            <option value="9">9+</option>
-            <option value="8">8+</option>
-            <option value="7">7+</option>
-            <option value="6">6+</option>
+          <select id="f-rating" , style="color: #673AB7;">
+            <option value="0" , style="color: #673AB7;">Any rating</option>
+            <option value="9" , style="color: #673AB7;">9+</option>
+            <option value="8" , style="color: #673AB7;">8+</option>
+            <option value="7" , style="color: #673AB7;">7+</option>
+            <option value="6" , style="color: #673AB7;">6+</option>
           </select>
         </div>
         <div class="grid" id="browse-grid"></div>
@@ -275,8 +276,8 @@
       <div class="glass-panel">
         <button class="modal-close" data-close="auth-modal">✕</button>
         <div class="auth-tabs">
-          <button id="tab-login" class="active">Log In</button>
-          <button id="tab-signup">Sign Up</button>
+          <button id="tab-login" class="active"><i class="fa-regular fa-circle-user"></i> Log In</button>
+          <button id="tab-signup"><i class="fa-solid fa-user-plus"></i> Sign Up</button>
         </div>
         <div class="auth-error" id="auth-error"></div>
 
@@ -377,7 +378,7 @@
     </div>
 
     <!-- ================= CHATBOT ================= -->
-    <button id="chat-fab">💬</button>
+    <button id="chat-fab"><i class="fa-solid fa-robot"></i></button>
     <div id="chat-panel">
       <div class="chat-head">
         <span class="dot"></span> MovieBD AI · ask for anything

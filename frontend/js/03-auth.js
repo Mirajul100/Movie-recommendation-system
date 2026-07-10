@@ -12,10 +12,10 @@ function renderAuthSlot() {
         <div class="dropdown" id="avatar-dropdown">
           <div style="padding:8px 10px;font-size:12.5px;color:var(--text-faint);">Signed in as <b style="color:var(--text)">${escapeHtml(state.user.username)}</b></div>
           <hr>
-          <a href="#/my-list">📋 My List</a>
-          ${state.user.is_admin ? '<a href="#/admin">🛠 Admin Dashboard</a>' : ""}
+          <a href="#/my-list"><i class="fa-regular fa-bookmark"></i> My List</a>
+          ${state.user.is_admin ? '<a href="#/admin"><i class="fa-solid fa-wrench"></i> Admin Dashboard</a>' : ""}
           <hr>
-          <button id="logout-btn">↩ Log Out</button>
+          <button id="logout-btn"><i class="fa-solid fa-sign-out"></i> Log Out</button>
         </div>
       </div>`;
     qs("#avatar-btn").onclick = () =>

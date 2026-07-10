@@ -1,0 +1,146 @@
+.fa-regular.fa-moon{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.fa-regular.fa-sun{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.fa-solid.fa-dice{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.fa-sharp.fa-solid.fa-magnifying-glass{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.fa-solid.fa-fire{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: rgb(220, 89, 7);
+}
+
+.fa-solid.fa-star{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: rgb(233, 241, 2);
+}
+
+.fa-solid.fa-chart-line{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: rgb(235, 186, 129);
+}
+
+.fa-solid.fa-gem{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: hsl(200, 83%, 36%);
+}
+
+.fa-solid.fa-trophy{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: rgb(122, 240, 177);
+}
+
+.fa-solid.fa-children{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: rgb(151, 241, 255);
+}
+
+.fa-solid.fa-wand-magic-sparkles{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: rgb(187, 133, 250);
+}   
+
+.fa-solid.fa-play{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: rgb(152, 141, 134);
+}
+
+.fa-regular.fa-calendar{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: rgb(241, 240, 239);
+}
+
+.fa-solid.fa-user-group{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: rgb(255, 129, 3);
+}
+
+.fa-solid.fa-film{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: rgb(120, 183, 251);
+}
+
+.fa-solid.fa-robot{
+    color: rgb(133, 255, 178);
+}
+
+.fa-regular.fa-face-smile{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: rgb(230, 144, 7);
+}
+
+.fa-regular.fa-face-sad-tear{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: rgb(89, 89, 226);
+}
+
+.fa-regular.fa-face-grin-stars{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: rgb(255, 255, 0);
+}
+
+.fa-regular.fa-heart{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: rgb(255, 0, 0);
+}
+
+.fa-solid.fa-leaf{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: rgb(0, 255, 0);
+}
+
+.fa-regular.fa-lightbulb{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: rgb(255, 255, 0);
+}   

@@ -35,12 +35,12 @@ const GENRE_GRADIENTS = {
   _default: ["#3a2b4d", "#1a1522"],
 };
 const MOOD_ICONS = {
-  happy: "😄",
-  sad: "😢",
-  excited: "🤩",
-  romantic: "💕",
-  relaxing: "🌿",
-  inspirational: "✨",
+  happy:'<i class="fa-regular fa-face-smile"></i>' || "😊",
+  sad: '<i class="fa-regular fa-face-sad-tear"></i>' || "😢",
+  excited: '<i class="fa-regular fa-face-grin-stars"></i>' || "🤩",
+  romantic: '<i class="fa-regular fa-heart"></i>' || "💕",
+  relaxing: '<i class="fa-solid fa-leaf"></i>' || "🍃",
+  inspirational: '<i class="fa-regular fa-lightbulb"></i>' || "💡",
 };
 const MOOD_DESC = {
   happy: "Comedies & feel-good family fun",

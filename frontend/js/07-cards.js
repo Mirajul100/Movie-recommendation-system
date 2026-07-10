@@ -51,15 +51,32 @@ function movieCard(movie) {
   observeCardPoster(el, movie);
   return el;
 }
+/* ---------------------------- row rendering ------------------------------ */
 function renderRow(container, { title, sub, items, seeAllHref }) {
+  // Clone the row template
   const tpl = qs("#tpl-row").content.cloneNode(true);
-  tpl.querySelector(".section-title").textContent = title;
+
+  // Render HTML (so Font Awesome icons work)
+  tpl.querySelector(".section-title").innerHTML = title;
+
+  // Subtitle
   tpl.querySelector(".section-sub").textContent = sub || "";
+
+  // "See All" button
   const seeAll = tpl.querySelector(".see-all");
-  if (seeAllHref) seeAll.href = seeAllHref;
-  else seeAll.remove();
+  if (seeAllHref) {
+    seeAll.href = seeAllHref;
+  } else {
+    seeAll.remove();
+  }
+
+  // Add movie cards
   const row = tpl.querySelector(".row-scroll");
-  items.forEach((m) => row.appendChild(movieCard(m)));
+  items.forEach((movie) => {
+    row.appendChild(movieCard(movie));
+  });
+
+  // Add the row to the page
   container.appendChild(tpl);
 }
 function renderGrid(container, items) {
