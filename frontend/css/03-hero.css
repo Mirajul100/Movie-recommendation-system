@@ -1,0 +1,104 @@
+/* ---------- Hero ---------- */
+#hero {
+  position: relative;
+  min-height: 86vh;
+  display: flex;
+  align-items: flex-end;
+  padding: 0 0 72px 0;
+  overflow: hidden;
+  background: #000;
+}
+#hero-bg {
+  position: absolute;
+  inset: 0;
+  background-size: cover;
+  background-position: center 20%;
+  filter: saturate(1.05);
+  transition: background-image 0.6s ease;
+}
+#hero-bg::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(
+      to top,
+      var(--bg) 2%,
+      rgba(8, 7, 10, 0.2) 42%,
+      rgba(8, 7, 10, 0.55) 100%
+    ),
+    linear-gradient(
+      to right,
+      rgba(8, 7, 10, 0.92) 0%,
+      rgba(8, 7, 10, 0.25) 55%,
+      rgba(8, 7, 10, 0.5) 100%
+    );
+}
+.hero-content {
+  position: relative;
+  z-index: 2;
+  max-width: 640px;
+  padding: 0 clamp(16px, 4vw, 48px);
+}
+.hero-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin-bottom: 14px;
+}
+.hero-title {
+  font-family: var(--font-display);
+  font-size: clamp(42px, 7vw, 88px);
+  line-height: 0.92;
+  letter-spacing: 0.5px;
+  margin: 0 0 16px;
+  text-shadow: 0 6px 30px rgba(0, 0, 0, 0.6);
+}
+.hero-meta {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  font-size: 14px;
+  color: var(--text-dim);
+  margin-bottom: 18px;
+  flex-wrap: wrap;
+}
+.rating-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-family: var(--font-mono);
+  font-weight: 600;
+  color: var(--gold);
+  border: 1px solid rgba(245, 197, 24, 0.4);
+  padding: 2px 9px;
+  border-radius: 6px;
+  font-size: 13px;
+}
+.hero-overview {
+  color: var(--text-dim);
+  font-size: 15.5px;
+  line-height: 1.6;
+  margin-bottom: 26px;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.hero-actions {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.hero-actions .btn {
+  padding: 12px 26px;
+  font-size: 14.5px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}

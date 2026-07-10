@@ -1,0 +1,65 @@
+/* ---------- Section rows ---------- */
+.section {
+  padding: 34px 0 6px;
+}
+.section-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: 14px;
+  padding: 0 clamp(16px, 4vw, 48px);
+}
+.section-title {
+  font-family: var(--font-display);
+  font-size: 26px;
+  letter-spacing: 0.5px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.section-title .tag {
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  background: var(--surface-strong);
+  color: var(--text-dim);
+  padding: 3px 8px;
+  border-radius: 5px;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+.section-sub {
+  font-size: 12.5px;
+  color: var(--text-faint);
+  margin-top: 2px;
+}
+.see-all {
+  font-size: 12.5px;
+  color: var(--text-dim);
+  white-space: nowrap;
+}
+.see-all:hover {
+  color: var(--red);
+}
+
+.row-scroll {
+  display: flex;
+  gap: 14px;
+  overflow-x: auto;
+  padding: 4px clamp(16px, 4vw, 48px) 20px;
+  scroll-snap-type: x proximity;
+  scrollbar-width: initial;
+}
+.row-scroll::-webkit-scrollbar {
+  height: 6px;
+}
+.row-scroll::-webkit-scrollbar-thumb {
+  background: var(--surface-strong);
+  border-radius: 3px;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+  gap: 16px;
+  padding: 0 clamp(16px, 4vw, 48px);
+}

@@ -1,0 +1,123 @@
+/* ---------- Movie card ---------- */
+.card {
+  position: relative;
+  flex: 0 0 168px;
+  scroll-snap-align: start;
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  cursor: pointer;
+  transition:
+    transform 0.28s cubic-bezier(0.2, 0.8, 0.2, 1),
+    box-shadow 0.28s,
+    border-color 0.28s;
+}
+.grid .card {
+  flex-basis: auto;
+}
+.card:hover {
+  transform: translateY(-6px) scale(1.035);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.55);
+  border-color: rgba(255, 255, 255, 0.18);
+  z-index: 5;
+}
+.card-poster {
+  width: 100%;
+  aspect-ratio: 2/3;
+  background: linear-gradient(
+    160deg,
+    var(--grad-a, #3a2b4d),
+    var(--grad-b, #1a1522)
+  );
+  position: relative;
+  overflow: hidden;
+}
+.card-poster img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0;
+  transition: opacity 0.35s;
+}
+.card-poster img.loaded {
+  opacity: 1;
+}
+.card-poster .fallback-title {
+  font-family: var(--font-display);
+  font-size: 15px;
+  text-align: center;
+  padding: 14px;
+  color: rgba(255, 255, 255, 0.85);
+  letter-spacing: 0.4px;
+  line-height: 1.15;
+}
+.card-badge {
+  position: absolute;
+  top: 6px;
+  left: 6px;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(4px);
+  color: var(--gold);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 600;
+  padding: 2px 6px;
+  border-radius: 5px;
+}
+.match-ring {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  width: 34px;
+  height: 34px;
+}
+.card-body {
+  padding: 9px 10px 11px;
+}
+.card-title {
+  font-size: 13px;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.card-genres {
+  font-size: 10.5px;
+  color: var(--text-faint);
+  margin-top: 3px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.card-quick {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  gap: 6px;
+  padding: 8px;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.85), transparent);
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+.card:hover .card-quick {
+  opacity: 1;
+}
+.card-quick button {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  background: rgba(0, 0, 0, 0.5);
+  color: #fff;
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.card-quick button:hover {
+  background: #fff;
+  color: #000;
+}

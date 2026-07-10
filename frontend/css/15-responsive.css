@@ -1,0 +1,39 @@
+/* ---------- Responsive ---------- */
+@media (max-width: 900px) {
+  .nav-links {
+    display: none;
+  }
+  .search-wrap {
+    width: 180px;
+  }
+  .hero-title {
+    font-size: clamp(34px, 10vw, 56px);
+  }
+  #hero {
+    min-height: 78vh;
+  }
+  .detail-title {
+    font-size: 30px;
+  }
+  .detail-body {
+    margin-top: -40px;
+  }
+}
+@media (max-width: 560px) {
+  .search-wrap {
+    width: 130px;
+  }
+  .brand {
+    font-size: 22px;
+  }
+  .card {
+    flex-basis: 132px;
+  }
+  .hero-actions .btn {
+    padding: 10px 18px;
+    font-size: 13px;
+  }
+  .filters-bar {
+    padding: 12px 16px;
+  }
+}

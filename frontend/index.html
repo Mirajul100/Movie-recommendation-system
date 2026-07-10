@@ -1,0 +1,484 @@
+<!--
+  MovieFlix — main page
+
+  This project is organized so each part of the app lives in its own file:
+    css/  → one stylesheet per UI section (see css/style.css for the list)
+    js/   → one script per feature, numbered in load order (see comments below)
+
+  Nothing about how the app behaves has changed — this is only a reorganization
+  of the exact same code into smaller, labeled files.
+-->
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>MovieFlix — Find your next watch</title>
+    <link rel="stylesheet" href="css/style.css" />
+  </head>
+  <body>
+    <div id="toast-stack"></div>
+
+    <!-- ================= NAV ================= -->
+    <header id="topnav">
+      <a href="#/home" class="brand" data-nav="home">MOVIE<span>FLIX</span></a>
+      <ul class="nav-links">
+        <li><a href="#/home" data-nav="home">Home</a></li>
+        <li><a href="#/genres" data-nav="genres">Genres</a></li>
+        <li><a href="#/moods" data-nav="moods">Moods</a></li>
+        <li><a href="#/collections" data-nav="collections">Collections</a></li>
+        <li><a href="#/my-list" data-nav="my-list">My List</a></li>
+      </ul>
+      <div class="nav-spacer"></div>
+      <div class="search-wrap">
+        <span class="search-icon">⌕</span>
+        <input
+          id="search-input"
+          type="text"
+          placeholder="Titles, actors, genres…"
+          autocomplete="off"
+        />
+        <div class="search-suggest" id="search-suggest"></div>
+      </div>
+      <div class="nav-actions">
+        <button class="icon-btn" id="surprise-btn" title="Surprise Me">
+          🎲
+        </button>
+        <button class="icon-btn" id="theme-toggle" title="Toggle theme">
+          ☾
+        </button>
+        <div id="auth-slot"></div>
+      </div>
+    </header>
+
+    <main id="app-root">
+      <!-- ================= HOME VIEW ================= -->
+      <section id="view-home">
+        <section id="hero">
+          <div id="hero-bg"></div>
+          <div class="hero-content">
+            <div class="hero-eyebrow" id="hero-badge">✦ Featured</div>
+            <h1 class="hero-title" id="hero-title">Loading…</h1>
+            <div class="hero-meta" id="hero-meta"></div>
+            <p class="hero-overview" id="hero-overview"></p>
+            <div class="hero-actions">
+              <button class="btn btn-primary" id="hero-more-info">
+                ▶ More Info
+              </button>
+              <button class="btn btn-ghost" id="hero-watchlist">
+                ＋ My List
+              </button>
+              <button class="btn btn-violet" id="hero-similar">
+                ✦ AI Similar
+              </button>
+            </div>
+          </div>
+        </section>
+
+        <div id="continue-watching-section" class="hide"></div>
+        <div id="recommended-for-you-section" class="hide"></div>
+
+        <template id="tpl-row">
+          <div class="section">
+            <div class="section-head">
+              <div>
+                <div class="section-title"></div>
+                <div class="section-sub"></div>
+              </div>
+              <a class="see-all" href="#">See all →</a>
+            </div>
+            <div class="row-scroll"></div>
+          </div>
+        </template>
+
+        <div id="rows-container"></div>
+
+        <section class="section">
+          <div class="section-head">
+            <div>
+              <div class="section-title">Browse by Genre</div>
+              <div class="section-sub">
+                Jump straight into what you're craving
+              </div>
+            </div>
+          </div>
+          <div class="tile-grid" id="genre-tiles"></div>
+        </section>
+
+        <section class="section">
+          <div class="section-head">
+            <div>
+              <div class="section-title">Match Your Mood</div>
+              <div class="section-sub">
+                Recommendations tuned to how you feel right now
+              </div>
+            </div>
+          </div>
+          <div class="tile-grid" id="mood-tiles"></div>
+        </section>
+
+        <section class="section">
+          <div class="section-head">
+            <div>
+              <div class="section-title">Time on Your Hands?</div>
+              <div class="section-sub">
+                Filtered by how much time you've got
+              </div>
+            </div>
+          </div>
+          <div class="tile-grid" id="time-tiles"></div>
+        </section>
+
+        <section class="section">
+          <div class="section-head">
+            <div>
+              <div class="section-title">Tools</div>
+            </div>
+          </div>
+          <div class="tile-grid">
+            <button
+              class="tile"
+              id="tool-compare"
+              style="
+                --grad-a: #2a1f3d;
+                background: linear-gradient(160deg, #2a1f3d, #160f22);
+                text-align: left;
+              "
+            >
+              <div class="tile-emoji">⚔️</div>
+              <div class="tile-name">Movie Match</div>
+              <div class="tile-sub">Compare two movies</div>
+            </button>
+            <button
+              class="tile"
+              id="tool-friend"
+              style="
+                text-align: left;
+                background: linear-gradient(160deg, #1f2f3d, #0f1a22);
+              "
+            >
+              <div class="tile-emoji">🤝</div>
+              <div class="tile-name">Friend Match</div>
+              <div class="tile-sub">What you'll both enjoy</div>
+            </button>
+            <button
+              class="tile"
+              id="tool-daily"
+              style="
+                text-align: left;
+                background: linear-gradient(160deg, #3d2f1f, #221a0f);
+              "
+            >
+              <div class="tile-emoji">📅</div>
+              <div class="tile-name">Daily Pick</div>
+              <div class="tile-sub">One new pick, every day</div>
+            </button>
+            <button
+              class="tile"
+              id="tool-surprise2"
+              style="
+                text-align: left;
+                background: linear-gradient(160deg, #3d1f2c, #220f18);
+              "
+            >
+              <div class="tile-emoji">🎲</div>
+              <div class="tile-name">Surprise Me</div>
+              <div class="tile-sub">Random roll of the dice</div>
+            </button>
+          </div>
+        </section>
+      </section>
+
+      <!-- ================= GENRE BROWSE VIEW ================= -->
+      <section id="view-browse" class="hide">
+        <div style="height: 90px"></div>
+        <div class="section-head container">
+          <div>
+            <div class="section-title" id="browse-title">Browse</div>
+            <div class="section-sub" id="browse-sub"></div>
+          </div>
+        </div>
+        <div class="filters-bar container">
+          <span class="filters-label">Filter</span>
+          <select id="f-genre">
+            <option value="" , style="color: black;">Any genre</option>
+          </select>
+          <select id="f-sort">
+            <option value="popularity">Sort: Popularity</option>
+            <option value="rating">Sort: Rating</option>
+            <option value="alpha">Sort: Alphabetical</option>
+          </select>
+          <select id="f-rating">
+            <option value="0">Any rating</option>
+            <option value="9">9+</option>
+            <option value="8">8+</option>
+            <option value="7">7+</option>
+            <option value="6">6+</option>
+          </select>
+        </div>
+        <div class="grid" id="browse-grid"></div>
+        <div style="text-align: center; padding: 30px">
+          <button class="btn btn-ghost" id="browse-load-more">Load more</button>
+        </div>
+      </section>
+
+      <!-- ================= GENRES INDEX VIEW ================= -->
+      <section id="view-genres" class="hide">
+        <div style="height: 90px"></div>
+        <div class="section-head container">
+          <div class="section-title">All Genres</div>
+        </div>
+        <div class="tile-grid" id="genres-index-tiles"></div>
+      </section>
+
+      <!-- ================= MOODS INDEX VIEW ================= -->
+      <section id="view-moods" class="hide">
+        <div style="height: 90px"></div>
+        <div class="section-head container">
+          <div class="section-title">Pick a Mood</div>
+        </div>
+        <div class="tile-grid" id="moods-index-tiles"></div>
+      </section>
+
+      <!-- ================= COLLECTIONS VIEW ================= -->
+      <section id="view-collections" class="hide">
+        <div style="height: 90px"></div>
+        <div class="section-head container">
+          <div>
+            <div class="section-title">Collections</div>
+            <div class="section-sub">Franchises, searched as a saga</div>
+          </div>
+        </div>
+        <div class="tile-grid" id="collections-tiles"></div>
+      </section>
+
+      <!-- ================= MY LIST VIEW ================= -->
+      <section id="view-mylist" class="hide">
+        <div style="height: 90px"></div>
+        <div class="section-head container">
+          <div class="section-title">My List</div>
+        </div>
+        <div class="section-sub container" style="margin-bottom: 14px">
+          Favorites
+        </div>
+        <div class="grid" id="mylist-favorites"></div>
+        <div class="section-sub container" style="margin: 30px 0 14px">
+          Watchlist
+        </div>
+        <div class="grid" id="mylist-watchlist"></div>
+      </section>
+
+      <!-- ================= ADMIN VIEW ================= -->
+      <div id="admin-view" class="hide"></div>
+    </main>
+
+    <!-- ================= MOVIE DETAIL MODAL ================= -->
+    <div class="overlay" id="movie-modal">
+      <div class="glass-panel" style="position: relative">
+        <button class="modal-close" data-close="movie-modal">✕</button>
+        <div id="movie-modal-content"></div>
+      </div>
+    </div>
+
+    <!-- ================= AUTH MODAL ================= -->
+    <div class="overlay" id="auth-modal">
+      <div class="glass-panel">
+        <button class="modal-close" data-close="auth-modal">✕</button>
+        <div class="auth-tabs">
+          <button id="tab-login" class="active">Log In</button>
+          <button id="tab-signup">Sign Up</button>
+        </div>
+        <div class="auth-error" id="auth-error"></div>
+
+        <form id="login-form">
+          <div class="field">
+            <label>Username</label
+            ><input type="text" id="login-username" required />
+          </div>
+          <div class="field">
+            <label>Password</label
+            ><input type="password" id="login-password" required />
+          </div>
+          <button class="btn btn-primary auth-submit" type="submit">
+            Log In
+          </button>
+        </form>
+
+        <form id="signup-form" class="hide">
+          <div class="field">
+            <label>Username</label
+            ><input type="text" id="signup-username" required minlength="3" />
+          </div>
+          <div class="field">
+            <label>Email</label
+            ><input type="email" id="signup-email" required />
+          </div>
+          <div class="field">
+            <label>Password</label
+            ><input
+              type="password"
+              id="signup-password"
+              required
+              minlength="6"
+            />
+          </div>
+          <button class="btn btn-primary auth-submit" type="submit">
+            Create Account
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <!-- ================= COMPARE MODAL ================= -->
+    <div class="overlay" id="compare-modal">
+      <div
+        class="glass-panel"
+        style="max-width: 640px; padding: 28px; position: relative"
+      >
+        <button class="modal-close" data-close="compare-modal">✕</button>
+        <h3
+          style="
+            font-family: var(--font-display);
+            font-size: 26px;
+            margin: 0 0 16px;
+          "
+          id="compare-heading"
+        >
+          Movie Match
+        </h3>
+        <div style="display: flex; gap: 10px; margin-bottom: 18px">
+          <input
+            type="text"
+            id="compare-a"
+            placeholder="First movie title…"
+            class="field"
+            style="
+              flex: 1;
+              background: var(--surface);
+              border: 1px solid var(--border);
+              border-radius: 8px;
+              color: var(--text);
+              padding: 10px 12px;
+            "
+          />
+          <input
+            type="text"
+            id="compare-b"
+            placeholder="Second movie title…"
+            style="
+              flex: 1;
+              background: var(--surface);
+              border: 1px solid var(--border);
+              border-radius: 8px;
+              color: var(--text);
+              padding: 10px 12px;
+            "
+          />
+        </div>
+        <button
+          class="btn btn-primary"
+          id="compare-submit"
+          style="width: 100%; margin-bottom: 18px"
+        >
+          Compare
+        </button>
+        <div id="compare-result"></div>
+      </div>
+    </div>
+
+    <!-- ================= CHATBOT ================= -->
+    <button id="chat-fab">💬</button>
+    <div id="chat-panel">
+      <div class="chat-head">
+        <span class="dot"></span> MovieFlix AI · ask for anything
+      </div>
+      <div class="chat-body" id="chat-body">
+        <div class="chat-msg bot">
+          Hey! Try "I want a funny movie like Deadpool" or "something sad and
+          inspiring".
+        </div>
+      </div>
+      <div class="chat-input-row">
+        <input
+          id="chat-input"
+          type="text"
+          placeholder="Describe what you're in the mood for…"
+        />
+        <button id="chat-send">➤</button>
+      </div>
+    </div>
+
+    <footer id="footer">
+      <div class="container">
+        <div class="foot-grid">
+          <div>
+            <h4>Explore</h4>
+            <a href="#/genres">Genres</a><a href="#/moods">Moods</a
+            ><a href="#/collections">Collections</a>
+          </div>
+          <div>
+            <h4>Account</h4>
+            <a href="#/my-list">My List</a><a href="#" id="foot-admin">Admin</a>
+          </div>
+          <div>
+            <h4>About</h4>
+            <span style="display: block; padding: 4px 0"
+              >Content-based ML recommendations, TMDB enrichment.</span
+            >
+          </div>
+        </div>
+        <div class="container" style="padding: 0">
+          © MovieFlix. Built for demo purposes — not affiliated with Netflix.
+        </div>
+      </div>
+    </footer>
+
+    <!--
+  Scripts below are split one-per-section for readability, but they behave
+  exactly like the original single app.js file: they share one global scope
+  and must load in this order (later files call functions defined earlier).
+-->
+    <script src="js/01-config.js"></script>
+    <!-- constants: API base, app state, color/icon lookup tables -->
+    <script src="js/02-helpers.js"></script>
+    <!-- small utilities: qs, qsa, escapeHtml, toast, api() fetch wrapper -->
+    <script src="js/03-auth.js"></script>
+    <!-- sign in / sign up / log out, "My Lists" loading -->
+    <script src="js/04-nav.js"></script>
+    <!-- top nav scroll shadow, closing dropdowns & modals -->
+    <script src="js/05-theme.js"></script>
+    <!-- light/dark theme toggle -->
+    <script src="js/06-poster-enrichment.js"></script>
+    <!-- lazy-loads real posters as cards scroll into view -->
+    <script src="js/07-cards.js"></script>
+    <!-- builds a movie card element + match-score ring -->
+    <script src="js/08-favorites-watchlist.js"></script>
+    <!-- add/remove favorites & watchlist -->
+    <script src="js/09-movie-modal.js"></script>
+    <!-- movie detail popup: trailer, cast, reviews, rating -->
+    <script src="js/10-hero.js"></script>
+    <!-- the big featured-movie banner at the top of Home -->
+    <script src="js/11-home-rows.js"></script>
+    <!-- "Trending", "Top Rated" etc. rows on Home -->
+    <script src="js/12-tiles.js"></script>
+    <!-- genre / mood / time-based / collection tiles -->
+    <script src="js/13-browse.js"></script>
+    <!-- the filterable Browse grid -->
+    <script src="js/14-search.js"></script>
+    <!-- search box + live suggestions dropdown -->
+    <script src="js/15-surprise.js"></script>
+    <!-- "Surprise Me" / "Daily Pick" random buttons -->
+    <script src="js/16-compare.js"></script>
+    <!-- "Movie Match" and "Friend Match" comparison tools -->
+    <script src="js/17-chatbot.js"></script>
+    <!-- the floating AI recommendation chat widget -->
+    <script src="js/18-mylist.js"></script>
+    <!-- "My List" page (favorites + watchlist) -->
+    <script src="js/19-admin.js"></script>
+    <!-- admin dashboard -->
+    <script src="js/20-router.js"></script>
+    <!-- hash-based page routing (#/home, #/browse, etc.) -->
+    <script src="js/21-init.js"></script>
+    <!-- kicks everything off once the page loads -->
+  </body>
+</html>

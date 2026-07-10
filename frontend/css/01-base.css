@@ -1,0 +1,48 @@
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap');
+
+:root{
+  --bg: #08070a;
+  --bg-elevated: #121016;
+  --surface: rgba(255,255,255,0.05);
+  --surface-strong: rgba(255,255,255,0.09);
+  --border: rgba(0, 0, 0, 0.08);
+  --text: #ffffff;
+  --text-dim: #a7a3b0;
+  --text-faint: #6f6b78;
+  --red: #e50914;
+  --red-dim: #9c0710;
+  --gold: #f5c518;
+  --violet: #8b5cf6;
+  --violet-dim: #6d28d9;
+  --green: #2ecc71;
+  --radius: 14px;
+  --radius-sm: 8px;
+  --maxw: 1400px;
+  --font-display: 'Bebas Neue', 'Inter', sans-serif;
+  --font-body: 'Inter', sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+}
+
+*{box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{
+  margin:0;
+  background:var(--bg);
+  color:var(--text);
+  font-family:var(--font-body);
+  -webkit-font-smoothing:antialiased;
+  overflow-x:hidden;
+}
+img{max-width:100%;display:block;}
+a{color:inherit;text-decoration:none;}
+button{font-family:inherit;cursor:pointer;}
+::selection{background:var(--red);color:#fff;}
+
+@media (prefers-reduced-motion: reduce){
+  *{animation-duration:0.001ms !important; transition-duration:0.001ms !important;}
+}
+
+/* ---------- Layout shells ---------- */
+.container{max-width:var(--maxw);margin:0 auto;padding:0 clamp(16px,4vw,48px);}
+.hide{display:none !important;}
+.visually-hidden{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);}

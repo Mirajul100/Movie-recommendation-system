@@ -1,0 +1,26 @@
+/* ---------- Light mode override ---------- */
+body.light {
+  --bg: #f7f6f4;
+  --bg-elevated: #ffffff;
+  --surface: rgba(0, 0, 0, 0.045);
+  --surface-strong: rgba(0, 0, 0, 0.08);
+  --border: rgba(0, 0, 0, 0.1);
+  --text: #17151a;
+  --text-dim: #4d4a54;
+  --text-faint: #8a8790;
+}
+body.light #hero-bg::after {
+  background:
+    linear-gradient(
+      to top,
+      var(--bg) 2%,
+      rgba(247, 246, 244, 0.2) 42%,
+      rgba(247, 246, 244, 0.55) 100%
+    ),
+    linear-gradient(
+      to right,
+      rgba(247, 246, 244, 0.92) 0%,
+      rgba(247, 246, 244, 0.25) 55%,
+      rgba(247, 246, 244, 0.5) 100%
+    );
+}

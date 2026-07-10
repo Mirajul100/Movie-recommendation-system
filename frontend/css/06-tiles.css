@@ -1,0 +1,37 @@
+/* ---------- Genre / mood tiles ---------- */
+.tile-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 14px;
+  padding: 0 clamp(16px, 4vw, 48px);
+}
+.tile {
+  border-radius: var(--radius-sm);
+  padding: 20px 16px;
+  min-height: 90px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  border: 1px solid var(--border);
+  position: relative;
+  overflow: hidden;
+  transition:
+    transform 0.2s,
+    border-color 0.2s;
+}
+.tile:hover {
+  transform: translateY(-3px);
+  border-color: rgba(255, 255, 255, 0.22);
+}
+.tile-emoji {
+  font-size: 22px;
+  margin-bottom: 6px;
+}
+.tile-name {
+  font-weight: 700;
+  font-size: 15px;
+}
+.tile-sub {
+  font-size: 11px;
+  color: var(--text-faint);
+}
