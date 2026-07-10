@@ -1,5 +1,5 @@
 /* ==========================================================================
-   MovieFlix front-end
+   MovieBD front-end
    Talks to the FastAPI backend mounted at the same origin (API_BASE = '').
    No build step — plain JS, works by opening index.html through the server.
    ========================================================================== */

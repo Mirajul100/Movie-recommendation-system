@@ -10,8 +10,8 @@ from sqlalchemy.orm import Session
 from backend.database import get_db
 from . import models
 
-# In production, set MOVIEFLIX_SECRET_KEY as a real environment variable.
-SECRET_KEY = os.environ.get("MOVIEFLIX_SECRET_KEY", "dev-secret-change-me-in-production")
+# In production, set MOVIBD_SECRET_KEY as a real environment variable.
+SECRET_KEY = os.environ.get("MOVIBD_SECRET_KEY", "dev-secret-change-me-in-production")
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 24 * 7  # 1 week
 

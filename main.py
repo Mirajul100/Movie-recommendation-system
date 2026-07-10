@@ -17,7 +17,7 @@ from backend.database import engine, get_db, Base
 
 Base.metadata.create_all(bind=engine)
 
-app = FastAPI(title="MovieFlix API", version="1.0.0")
+app = FastAPI(title="MovieBD API", version="1.0.0")
 
 app.add_middleware(
     CORSMiddleware,
