@@ -2,6 +2,8 @@ import asyncio
 from datetime import datetime
 from typing import Optional
 import os
+from backend.tmdb import enrich_by_title
+
 
 from fastapi import FastAPI, Depends, HTTPException, status, Query
 from fastapi.middleware.cors import CORSMiddleware
@@ -68,11 +70,11 @@ def me(user: models.User = Depends(auth.get_current_user)):
 # Discovery / browse endpoints
 # ---------------------------------------------------------------------------
 @app.get("/api/search")
-def search(q: str = Query(min_length=1), limit: int = 10, db: Session = Depends(get_db)):
-    db.add(models.SearchLog(query=q))
-    db.commit()
-    return rec.search_titles(q, limit=limit)
-
+async def search(q: str, limit: int = 8):
+    movies = rec.search_titles(q, limit)
+    for movie in movies:
+        movie.update(await tmdb.enrich_by_title(movie["title"]))
+    return movies
 
 @app.get("/api/genres")
 def genres():

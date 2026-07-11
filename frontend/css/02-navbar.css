@@ -113,6 +113,8 @@
   opacity: 1;
   transform: translateY(0);
   pointer-events: auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--surface) transparent;
 }
 .suggest-row {
   display: flex;

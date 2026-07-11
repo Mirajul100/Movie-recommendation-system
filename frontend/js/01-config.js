@@ -1,9 +1,9 @@
 /* ==========================================================================
-   MovieBD front-end
-   Talks to the FastAPI backend mounted at the same origin (API_BASE = '').
-   No build step — plain JS, works by opening index.html through the server.
-   ========================================================================== */
+   MovieBD Front-End
+   ========================================================================= */
+
 const API = "";
+
 const state = {
   token: localStorage.getItem("mf_token") || null,
   user: JSON.parse(localStorage.getItem("mf_user") || "null"),
@@ -11,6 +11,8 @@ const state = {
   favoriteIds: new Set(),
   watchlistIds: new Set(),
 };
+
+/* ----------------------------- Genre Colors ----------------------------- */
 
 const GENRE_GRADIENTS = {
   Action: ["#7a1f1f", "#1a0a0a"],
@@ -34,26 +36,35 @@ const GENRE_GRADIENTS = {
   Western: ["#5a4a1f", "#181408"],
   _default: ["#3a2b4d", "#1a1522"],
 };
+
+/* ----------------------------- Mood Icons ----------------------------- */
+
 const MOOD_ICONS = {
-  happy:'<i class="fa-regular fa-face-smile"></i>' || "😊",
-  sad: '<i class="fa-regular fa-face-sad-tear"></i>' || "😢",
-  excited: '<i class="fa-regular fa-face-grin-stars"></i>' || "🤩",
-  romantic: '<i class="fa-regular fa-heart"></i>' || "💕",
-  relaxing: '<i class="fa-solid fa-leaf"></i>' || "🍃",
-  inspirational: '<i class="fa-regular fa-lightbulb"></i>' || "💡",
+  happy: '<i class="fa-regular fa-face-smile"></i>',
+  sad: '<i class="fa-regular fa-face-sad-tear"></i>',
+  excited: '<i class="fa-regular fa-face-grin-stars"></i>',
+  romantic: '<i class="fa-regular fa-heart"></i>',
+  relaxing: '<i class="fa-solid fa-leaf"></i>',
+  inspirational: '<i class="fa-regular fa-lightbulb"></i>',
 };
+
+/* ----------------------------- Mood Descriptions ----------------------------- */
+
 const MOOD_DESC = {
   happy: "Comedies & feel-good family fun",
   sad: "Dramas worth a good cry",
-  excited: "Action, adventure & thrillers",
+  excited: "Action, Adventure & Thrillers",
   romantic: "Love stories, front and center",
   relaxing: "Easy, low-stakes watching",
-  inspirational: "Stories that light a fire in you",
+  inspirational: "Stories that inspire and motivate",
 };
+
+/* ----------------------------- Featured Collections ----------------------------- */
+
 const COLLECTIONS = [
   "Harry Potter",
   "Marvel",
-  "Fast",
+  "Fast & Furious",
   "Mission: Impossible",
   "Batman",
   "Star Wars",
