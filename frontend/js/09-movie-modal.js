@@ -52,7 +52,7 @@ async function openMovieModal(id) {
       ${
         movie.cast && movie.cast.length
           ? `
-      <div class="detail-section-title">🎭 Cast</div>
+      <div class="detail-section-title"><i class="fa-solid fa-users"></i> Cast</div>
       <div class="cast-row">${movie.cast
         .map(
           (name) => `
@@ -67,10 +67,10 @@ async function openMovieModal(id) {
           : ""
       }
 
-      <div class="detail-section-title">⭐ Rate this movie</div>
+      <div class="detail-section-title"><i class="fa-solid fa-star"></i> Rate this movie</div>
       <div class="stars-input" id="dm-stars">${[1, 2, 3, 4, 5].map((i) => `<span class="star" data-v="${i}">★</span>`).join("")}</div>
 
-      <div class="detail-section-title">💬 Reviews (${reviews.length})</div>
+      <div class="detail-section-title"><i class="fa-solid fa-comment"></i> Reviews (${reviews.length})</div>
       <textarea class="review-input" id="dm-review-text" placeholder="Share your thoughts…"></textarea>
       <button class="btn btn-ghost btn-sm" id="dm-review-submit" style="margin-top:8px;">Post Review</button>
       <div id="dm-reviews">${

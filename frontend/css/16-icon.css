@@ -99,7 +99,7 @@
     color: rgb(120, 183, 251);
 }
 
-.fa-solid.fa-robot{
+.fa-brands.fa-empire.fa-beat-fade{
     color: rgb(133, 255, 178);
 }
 
@@ -144,3 +144,31 @@
     justify-content: center;
     color: rgb(255, 255, 0);
 }   
+
+.fa-regular.fa-paper-plane{
+    color: rgb(129, 244, 255);
+}
+
+.fa-solid.fa-play{
+    color: rgb(255, 255, 255);
+}
+
+.fa-solid.fa-users{
+    color: rgb(255, 180, 180);
+}
+
+.fa-solid.fa-comment{
+    color: rgb(129, 244, 255);
+}
+
+.fa-regular.fa-clock{
+    color: rgb(254, 250, 213);
+}
+
+.fa-solid.fa-couch{
+    color: rgb(103, 184, 17);
+}
+
+.fa-solid.fa-photo-film{
+    color: rgb(69, 252, 160);
+}

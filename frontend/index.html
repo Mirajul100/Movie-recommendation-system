@@ -54,13 +54,13 @@
             <p class="hero-overview" id="hero-overview"></p>
             <div class="hero-actions">
               <button class="btn btn-primary" id="hero-more-info">
-                ▶ More Info
+                <i class="fa-solid fa-play"></i> More Info
               </button>
               <button class="btn btn-ghost" id="hero-watchlist">
-                ＋ My List
+                <i class="fa-solid fa-plus"></i> My List
               </button>
               <button class="btn btn-violet" id="hero-similar">
-                ✦ AI Similar
+                <i class="fa-solid fa-magic"></i> AI Similar
               </button>
             </div>
           </div>
@@ -379,26 +379,27 @@
     </div>
 
     <!-- ================= CHATBOT ================= -->
-    <button id="chat-fab"><i class="fa-solid fa-robot"></i></button>
-    <div id="chat-panel">
-      <div class="chat-head">
-        <span class="dot"></span> MovieBD AI · ask for anything
-      </div>
-      <div class="chat-body" id="chat-body">
-        <div class="chat-msg bot">
-          Hey! Try "I want a funny movie like Deadpool" or "something sad and
-          inspiring".
-        </div>
-      </div>
-      <div class="chat-input-row">
-        <input
-          id="chat-input"
-          type="text"
-          placeholder="Describe what you're in the mood for…"
-        />
-        <button id="chat-send">➤</button>
-      </div>
-    </div>
+   
+
+<button id="chat-fab" aria-label="Open MovieBD AI chat">
+  <i class="fa-brands fa-empire fa-beat-fade"></i>
+  <span class="ping"></span>
+</button>
+
+<div id="chat-panel">
+  <div class="sprockets"></div>
+  <div class="chat-head">
+    <span class="dot"></span> MovieBD AI
+    <small>mood → movie, instantly</small>
+  </div>
+  <div class="chat-body" id="chat-body"></div>
+  <div class="chat-input-row">
+    <input id="chat-input" type="text" placeholder="Describe what you're in the mood for…" autocomplete="off" />
+    <button id="chat-send" aria-label="Send"><i class="fa-regular fa-paper-plane"></i></button>
+  </div>
+</div>
+
+
 
     <footer id="footer">
       <div class="container">

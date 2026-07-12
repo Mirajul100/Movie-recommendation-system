@@ -61,10 +61,6 @@ So here's exactly how each feature is sourced:
   not a hosted LLM. It's honest about that in the code comment; wiring in
   a real LLM (e.g. Claude via the API) is a straightforward next step if
   you want it upgraded.
-- **Admin "Manage movies/genres"** — since movies come from a static
-  pickle rather than a live DB, editing them isn't wired up; the dashboard
-  instead covers what's actually dynamic: users, reviews, and search
-  analytics.
 
 ## Known limitations to be aware of
 

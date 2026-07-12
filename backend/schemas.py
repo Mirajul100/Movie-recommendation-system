@@ -54,9 +54,9 @@ class HistoryCreate(BaseModel):
 
 
 class CompareRequest(BaseModel):
-    title_a: str
+    title_a: str = Field(min_length=1, max_length=200)
     title_b: str
 
 
 class ChatRequest(BaseModel):
-    message: str
+    message: str = Field(min_length=1, max_length=1000)

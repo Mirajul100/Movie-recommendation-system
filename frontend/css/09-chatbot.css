@@ -64,6 +64,8 @@
   display: flex;
   flex-direction: column;
   gap: 10px;
+  scrollbar-width: thin;
+  scrollbar-color: var(--surface-strong) transparent;
 }
 .chat-msg {
   max-width: 85%;

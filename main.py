@@ -1,33 +1,103 @@
 import asyncio
-from datetime import datetime
-from typing import Optional
 import os
-from backend.tmdb import enrich_by_title
+from contextlib import asynccontextmanager
+from datetime import datetime, timezone
+from typing import List
 
-
-from fastapi import FastAPI, Depends, HTTPException, status, Query
+from fastapi import FastAPI, Depends, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.middleware.gzip import GZipMiddleware
 from fastapi.staticfiles import StaticFiles
+from starlette.responses import Response
 from sqlalchemy.orm import Session
+from sqlalchemy import func
 
 from backend import auth
 from backend import recommender as rec
 from backend import tmdb
 from backend import models
 from backend import schemas
+from backend.cache import listing_cache, daily_pick_cache
 from backend.database import engine, get_db, Base
+
+# Use orjson for faster JSON encoding when available; fall back silently
+# to FastAPI's default encoder otherwise (no hard dependency required).
+#
+# NOTE: importing `fastapi.responses.ORJSONResponse` never raises
+# ImportError even when orjson isn't installed -- FastAPI only checks for
+# orjson lazily inside .render(), via an `assert`, which blows up on the
+# *first real request* instead of at startup. So we must probe for the
+# `orjson` package itself, not the response class, to pick correctly.
+try:
+    import orjson  # noqa: F401
+    from fastapi.responses import ORJSONResponse as _FastResponse
+except ImportError:  # orjson not installed
+    from fastapi.responses import JSONResponse as _FastResponse
 
 Base.metadata.create_all(bind=engine)
 
-app = FastAPI(title="MovieBD API", version="1.0.0")
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    yield
+    # Release the pooled TMDB HTTP connections cleanly on shutdown instead
+    # of leaking sockets when the process exits.
+    await tmdb.close_client()
+
+
+app = FastAPI(
+    title="MovieBD API",
+    version="1.1.0",
+    default_response_class=_FastResponse,
+    lifespan=lifespan,
+)
+
+# Compresses JSON/HTML/static payloads over ~500 bytes -> smaller transfer,
+# faster perceived load, especially on slower mobile connections.
+app.add_middleware(GZipMiddleware, minimum_size=500)
 
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["http://localhost:3000"],  # replace with your real frontend origin(s)
     allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_methods=["GET", "POST", "DELETE"],
+    allow_headers=["Authorization", "Content-Type"],
 )
+
+
+# ---------------------------------------------------------------------------
+# Helpers
+# ---------------------------------------------------------------------------
+async def enrich_movies_concurrently(movies: List[dict]) -> List[dict]:
+    """Enrich a list of movie dicts with TMDB poster/backdrop data in
+    parallel instead of one-await-at-a-time. Caching + stampede protection
+    for repeated/concurrent lookups of the same title already happens
+    inside tmdb.enrich_by_title, so this just fans the calls out."""
+
+    async def enrich_one(movie: dict) -> dict:
+        data = await tmdb.enrich_by_title(movie["title"])
+        movie.update(data or {})
+        return movie
+
+    return list(await asyncio.gather(*(enrich_one(m) for m in movies)))
+
+
+def cached_listing(cache_key, ttl=None):
+    """Decorator for pure, deterministic list endpoints (trending, popular,
+    genres, ...) whose results only change when the dataset reloads."""
+
+    def decorator(fn):
+        async def wrapper(*args, **kwargs):
+            key = (cache_key, args, tuple(sorted(kwargs.items())))
+
+            async def factory():
+                return fn(*args, **kwargs)
+
+            return await listing_cache.get_or_set(key, factory, ttl)
+
+        return wrapper
+
+    return decorator
 
 
 # ---------------------------------------------------------------------------
@@ -70,62 +140,100 @@ def me(user: models.User = Depends(auth.get_current_user)):
 # Discovery / browse endpoints
 # ---------------------------------------------------------------------------
 @app.get("/api/search")
-async def search(q: str, limit: int = 8):
+async def search(q: str, limit: int = Query(8, ge=1, le=40)):
     movies = rec.search_titles(q, limit)
-    for movie in movies:
-        movie.update(await tmdb.enrich_by_title(movie["title"]))
-    return movies
+    return await enrich_movies_concurrently(movies)
+
 
 @app.get("/api/genres")
-def genres():
-    return rec.list_genres()
+async def genres():
+    async def factory():
+        return rec.list_genres()
+
+    return await listing_cache.get_or_set("genres", factory, ttl=60 * 60)
+
 
 @app.get("/api/genre/{genre}")
-def genre_movies(genre: str, limit: int = 24, offset: int = 0):
-    return rec.search_by_genre(genre, limit=limit, offset=offset)
+async def genre_movies(genre: str, limit: int = Query(24, ge=1, le=100), offset: int = 0):
+    async def factory():
+        return rec.search_by_genre(genre, limit=limit, offset=offset)
+
+    return await listing_cache.get_or_set(("genre", genre, limit, offset), factory)
+
 
 @app.get("/api/trending")
-def trending(limit: int = 24, offset: int = 0):
-    return rec.trending(limit=limit, offset=offset)
+async def trending(limit: int = Query(24, ge=1, le=100), offset: int = 0):
+    async def factory():
+        return rec.trending(limit=limit, offset=offset)
+
+    return await listing_cache.get_or_set(("trending", limit, offset), factory)
+
 
 @app.get("/api/top-rated")
-def top_rated(limit: int = 24, offset: int = 0):
-    return rec.top_rated(limit=limit, offset=offset)
+async def top_rated(limit: int = Query(24, ge=1, le=100), offset: int = 0):
+    async def factory():
+        return rec.top_rated(limit=limit, offset=offset)
+
+    return await listing_cache.get_or_set(("top_rated", limit, offset), factory)
+
 
 @app.get("/api/popular")
-def popular(limit: int = 24, offset: int = 0):
-    return rec.popular(limit=limit, offset=offset)
+async def popular(limit: int = Query(24, ge=1, le=100), offset: int = 0):
+    async def factory():
+        return rec.popular(limit=limit, offset=offset)
+
+    return await listing_cache.get_or_set(("popular", limit, offset), factory)
+
 
 @app.get("/api/hidden-gems")
-def hidden_gems(limit: int = 24, offset: int = 0):
-    return rec.hidden_gems(limit=limit, offset=offset)
+async def hidden_gems(limit: int = Query(24, ge=1, le=100), offset: int = 0):
+    async def factory():
+        return rec.hidden_gems(limit=limit, offset=offset)
+
+    return await listing_cache.get_or_set(("hidden_gems", limit, offset), factory)
+
 
 @app.get("/api/award-winners")
-def award_winners(limit: int = 24, offset: int = 0):
-    return rec.award_winners(limit=limit, offset=offset)
+async def award_winners(limit: int = Query(24, ge=1, le=100), offset: int = 0):
+    async def factory():
+        return rec.award_winners(limit=limit, offset=offset)
+
+    return await listing_cache.get_or_set(("award_winners", limit, offset), factory)
+
 
 @app.get("/api/family-friendly")
-def family_friendly(limit: int = 24, offset: int = 0):
-    return rec.family_friendly(limit=limit, offset=offset)
+async def family_friendly(limit: int = Query(24, ge=1, le=100), offset: int = 0):
+    async def factory():
+        return rec.family_friendly(limit=limit, offset=offset)
+
+    return await listing_cache.get_or_set(("family_friendly", limit, offset), factory)
+
 
 @app.get("/api/mood/{mood}")
-def mood(mood: str, limit: int = 24, offset: int = 0):
-    results = rec.by_mood(mood, limit=limit, offset=offset)
+async def mood(mood: str, limit: int = Query(24, ge=1, le=100), offset: int = 0):
+    async def factory():
+        return rec.by_mood(mood, limit=limit, offset=offset)
+
+    results = await listing_cache.get_or_set(("mood", mood, limit, offset), factory)
     if not results and mood.lower() not in rec.MOOD_TO_GENRES:
         raise HTTPException(404, f"Unknown mood '{mood}'. Try: {list(rec.MOOD_TO_GENRES)}")
     return results
 
+
 @app.get("/api/random")
 def random_movie():
     return rec.random_movie()
+
 
 @app.get("/api/movie/{movie_id}")
 async def movie_detail(movie_id: int):
     movie = rec.get_movie_by_id(movie_id)
     if not movie:
         raise HTTPException(404, "Movie not found")
+
     enrichment = await tmdb.enrich_by_title(movie["title"])
-    return {**movie, **enrichment}
+    return {**movie, **(enrichment or {})}
+
 
 @app.get("/api/enrich")
 async def enrich_batch(titles: str):
@@ -135,12 +243,18 @@ async def enrich_batch(titles: str):
     results = await asyncio.gather(*(tmdb.enrich_by_title(t) for t in title_list))
     return dict(zip(title_list, results))
 
+
 @app.get("/api/recommend/{movie_id}")
-def recommend_similar(movie_id: int, limit: int = 12):
+async def recommend_similar(movie_id: int, limit: int = Query(12, ge=1, le=50)):
     movie = rec.get_movie_by_id(movie_id)
     if not movie:
         raise HTTPException(404, "Movie not found")
-    return rec.recommend(movie["title"], top_n=limit)
+
+    async def factory():
+        return rec.recommend(movie["title"], top_n=limit)
+
+    return await listing_cache.get_or_set(("recommend", movie_id, limit), factory, ttl=30 * 60)
+
 
 @app.post("/api/compare")
 def compare(payload: schemas.CompareRequest):
@@ -149,6 +263,7 @@ def compare(payload: schemas.CompareRequest):
         raise HTTPException(404, "One or both titles not found")
     return result
 
+
 @app.post("/api/friend-match")
 def friend_match(payload: schemas.CompareRequest):
     result = rec.friend_match(payload.title_a, payload.title_b)
@@ -156,19 +271,29 @@ def friend_match(payload: schemas.CompareRequest):
         raise HTTPException(404, "One or both titles not found")
     return result
 
+
 @app.post("/api/chatbot")
-def chatbot(payload: schemas.ChatRequest):
-    return rec.chatbot_recommend(payload.message)
+async def chatbot(payload: schemas.ChatRequest):
+    data = rec.chatbot_recommend(payload.message)
+    data["results"] = await enrich_movies_concurrently(data["results"])
+    return data
+
 
 @app.get("/api/daily-pick")
-def daily_pick():
-    # Deterministic per calendar day so it doesn't change on refresh.
-    seed = int(datetime.utcnow().strftime("%Y%m%d"))
-    subset = rec.DF[rec.DF["vote_average"] >= 7]
-    if subset.empty:
-        subset = rec.DF
-    row = subset.iloc[seed % len(subset)]
-    return rec.movie_to_dict(row)
+async def daily_pick():
+    # Deterministic per calendar day (UTC), and now actually cached so we
+    # don't rescan/filter the whole DataFrame on every single request.
+    today_key = datetime.now(timezone.utc).strftime("%Y%m%d")
+
+    async def factory():
+        seed = int(today_key)
+        subset = rec.DF[rec.DF["vote_average"] >= 7]
+        if subset.empty:
+            subset = rec.DF
+        row = subset.iloc[seed % len(subset)]
+        return rec.movie_to_dict(row)
+
+    return await daily_pick_cache.get_or_set(("daily_pick", today_key), factory)
 
 
 # ---------------------------------------------------------------------------
@@ -184,12 +309,14 @@ def add_favorite(payload: schemas.MovieRef, user: models.User = Depends(auth.get
     db.commit()
     return {"status": "added"}
 
+
 @app.delete("/api/favorites/{movie_id}")
 def remove_favorite(movie_id: int, user: models.User = Depends(auth.get_current_user),
                      db: Session = Depends(get_db)):
     db.query(models.Favorite).filter_by(user_id=user.id, movie_id=movie_id).delete()
     db.commit()
     return {"status": "removed"}
+
 
 @app.get("/api/favorites")
 def list_favorites(user: models.User = Depends(auth.get_current_user), db: Session = Depends(get_db)):
@@ -206,12 +333,14 @@ def add_watchlist(payload: schemas.MovieRef, user: models.User = Depends(auth.ge
     db.commit()
     return {"status": "added"}
 
+
 @app.delete("/api/watchlist/{movie_id}")
 def remove_watchlist(movie_id: int, user: models.User = Depends(auth.get_current_user),
                       db: Session = Depends(get_db)):
     db.query(models.WatchlistItem).filter_by(user_id=user.id, movie_id=movie_id).delete()
     db.commit()
     return {"status": "removed"}
+
 
 @app.get("/api/watchlist")
 def list_watchlist(user: models.User = Depends(auth.get_current_user), db: Session = Depends(get_db)):
@@ -226,11 +355,13 @@ def log_history(payload: schemas.HistoryCreate, user: models.User = Depends(auth
     db.commit()
     return {"status": "logged"}
 
+
 @app.get("/api/history/recent")
 def recent_history(limit: int = 12, user: models.User = Depends(auth.get_current_user),
                     db: Session = Depends(get_db)):
     return (db.query(models.WatchHistory).filter_by(user_id=user.id)
             .order_by(models.WatchHistory.viewed_at.desc()).limit(limit).all())
+
 
 @app.get("/api/history/continue-watching")
 def continue_watching(user: models.User = Depends(auth.get_current_user), db: Session = Depends(get_db)):
@@ -238,17 +369,48 @@ def continue_watching(user: models.User = Depends(auth.get_current_user), db: Se
             .filter(models.WatchHistory.progress_pct < 100)
             .order_by(models.WatchHistory.viewed_at.desc()).limit(12).all())
 
+
 @app.get("/api/recommended-for-you")
 def recommended_for_you(user: models.User = Depends(auth.get_current_user), db: Session = Depends(get_db)):
-    seed_titles = [f.movie_title for f in db.query(models.Favorite).filter_by(user_id=user.id).limit(5)]
-    if not seed_titles:
-        seed_titles = [h.movie_title for h in
-                       db.query(models.WatchHistory).filter_by(user_id=user.id)
-                       .order_by(models.WatchHistory.viewed_at.desc()).limit(5)]
-    if not seed_titles:
+    """
+    Improved personalization signal:
+    - Blends favorites (strongest signal), high star-ratings, and recent
+      watch history instead of only ever looking at up to 5 favorites.
+    - Weights each seed title so favorites/high-ratings count more than
+      a title someone merely started watching.
+    - Falls back to trending only when the user truly has zero signal.
+    """
+    favorites = (db.query(models.Favorite)
+                 .filter_by(user_id=user.id)
+                 .order_by(models.Favorite.id.desc()).limit(8).all())
+    top_ratings = (db.query(models.Rating)
+                    .filter(models.Rating.user_id == user.id, models.Rating.stars >= 4)
+                    .order_by(models.Rating.id.desc()).limit(8).all())
+    recent_history_rows = (db.query(models.WatchHistory)
+                            .filter_by(user_id=user.id)
+                            .order_by(models.WatchHistory.viewed_at.desc()).limit(8).all())
+
+    # weight: favorites > high ratings > recently watched, de-duplicated
+    # while preserving the highest weight seen for each title.
+    weighted: dict[str, float] = {}
+    for f in favorites:
+        weighted[f.movie_title] = max(weighted.get(f.movie_title, 0), 3.0)
+    for r in top_ratings:
+        weighted[r.movie_title] = max(weighted.get(r.movie_title, 0), 2.0 + (r.stars - 4) * 0.5)
+    for h in recent_history_rows:
+        weighted[h.movie_title] = max(weighted.get(h.movie_title, 0), 1.0)
+
+    if not weighted:
         return {"basis": "trending (add favorites to personalize this)", "results": rec.trending(limit=12)}
-    return {"basis": f"because you liked {', '.join(seed_titles[:2])}",
-            "results": rec.recommend_with_explanation(seed_titles, top_n=12)}
+
+    seed_titles = [t for t, _ in sorted(weighted.items(), key=lambda kv: kv[1], reverse=True)][:8]
+
+    basis_source = favorites[0].movie_title if favorites else seed_titles[0]
+    return {
+        "basis": f"because you liked {basis_source}"
+                 + (f" and {len(seed_titles) - 1} more" if len(seed_titles) > 1 else ""),
+        "results": rec.recommend_with_explanation(seed_titles, top_n=12),
+    }
 
 
 @app.post("/api/ratings")
@@ -263,6 +425,7 @@ def rate_movie(payload: schemas.RatingCreate, user: models.User = Depends(auth.g
     db.commit()
     return {"status": "rated"}
 
+
 @app.post("/api/reviews")
 def add_review(payload: schemas.ReviewCreate, user: models.User = Depends(auth.get_current_user),
                db: Session = Depends(get_db)):
@@ -273,15 +436,26 @@ def add_review(payload: schemas.ReviewCreate, user: models.User = Depends(auth.g
     db.refresh(review)
     return review
 
+
 @app.get("/api/reviews/{movie_id}")
 def get_reviews(movie_id: int, db: Session = Depends(get_db)):
-    reviews = db.query(models.Review).filter_by(movie_id=movie_id).order_by(models.Review.created_at.desc()).all()
-    out = []
-    for r in reviews:
-        user = db.get(models.User, r.user_id)
-        out.append({"id": r.id, "body": r.body, "created_at": r.created_at,
-                    "username": user.username if user else "deleted user"})
-    return out
+    # Single joined query instead of one extra SELECT per review (N+1 fix).
+    rows = (
+        db.query(models.Review, models.User.username)
+        .outerjoin(models.User, models.User.id == models.Review.user_id)
+        .filter(models.Review.movie_id == movie_id)
+        .order_by(models.Review.created_at.desc())
+        .all()
+    )
+    return [
+        {
+            "id": review.id,
+            "body": review.body,
+            "created_at": review.created_at,
+            "username": username or "deleted user",
+        }
+        for review, username in rows
+    ]
 
 
 # ---------------------------------------------------------------------------
@@ -291,6 +465,7 @@ def require_admin(user: models.User = Depends(auth.get_current_user)):
     if not user.is_admin:
         raise HTTPException(403, "Admin access required")
     return user
+
 
 @app.get("/api/admin/stats")
 def admin_stats(admin: models.User = Depends(require_admin), db: Session = Depends(get_db)):
@@ -303,21 +478,24 @@ def admin_stats(admin: models.User = Depends(require_admin), db: Session = Depen
         "total_searches": db.query(models.SearchLog).count(),
     }
 
+
 @app.get("/api/admin/top-searches")
 def top_searches(limit: int = 20, admin: models.User = Depends(require_admin), db: Session = Depends(get_db)):
-    from sqlalchemy import func
     rows = (db.query(models.SearchLog.query, func.count(models.SearchLog.id).label("count"))
             .group_by(models.SearchLog.query).order_by(func.count(models.SearchLog.id).desc())
             .limit(limit).all())
     return [{"query": q, "count": c} for q, c in rows]
 
+
 @app.get("/api/admin/users")
 def list_users(admin: models.User = Depends(require_admin), db: Session = Depends(get_db)):
     return db.query(models.User).all()
 
+
 @app.get("/api/admin/reviews")
 def all_reviews(admin: models.User = Depends(require_admin), db: Session = Depends(get_db)):
     return db.query(models.Review).order_by(models.Review.created_at.desc()).limit(200).all()
+
 
 @app.delete("/api/admin/reviews/{review_id}")
 def delete_review(review_id: int, admin: models.User = Depends(require_admin), db: Session = Depends(get_db)):
@@ -331,7 +509,21 @@ def health():
     return {"status": "ok", "movies_loaded": len(rec.DF)}
 
 
-# Serve the frontend as static files so the whole app runs from one process.
-FRONTEND_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "frontend")
+# ---------------------------------------------------------------------------
+# Static frontend with long-lived cache headers for hashed build assets.
+# ---------------------------------------------------------------------------
+class CachedStaticFiles(StaticFiles):
+    async def get_response(self, path: str, scope) -> Response:
+        response = await super().get_response(path, scope)
+        # index.html must revalidate so deploys show up immediately; other
+        # build assets (js/css/images, usually content-hashed) can be
+        # cached hard by the browser/CDN for a much faster repeat load.
+        if path.endswith("index.html") or path == "":
+            response.headers["Cache-Control"] = "no-cache"
+        else:
+            response.headers["Cache-Control"] = "public, max-age=31536000, immutable"
+        return response
 
-app.mount("/", StaticFiles(directory=FRONTEND_DIR, html=True), name="frontend")
+
+FRONTEND_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "frontend")
+app.mount("/", CachedStaticFiles(directory=FRONTEND_DIR, html=True), name="frontend")

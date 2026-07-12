@@ -36,13 +36,13 @@ function loadMoodTiles() {
 function loadTimeTiles() {
   qs("#time-tiles").innerHTML = `
     <a class="tile" href="#/browse?time=short" style="background:linear-gradient(160deg,#1f3d3d,#0a1a1a);">
-      <div class="tile-emoji">⏱</div><div class="tile-name">Under 90 Min</div><div class="tile-sub">Quick watches</div>
+      <div class="tile-emoji"><i class="fa-regular fa-clock"></i></div><div class="tile-name">Under 90 Min</div><div class="tile-sub">Quick watches</div>
     </a>
     <a class="tile" href="#/browse?time=weekend" style="background:linear-gradient(160deg,#3d2f1f,#1a1108);">
-      <div class="tile-emoji">🛋️</div><div class="tile-name">Weekend Movies</div><div class="tile-sub">Popular crowd-pleasers</div>
+      <div class="tile-emoji"><i class="fa-solid fa-couch"></i></div><div class="tile-name">Weekend Movies</div><div class="tile-sub">Popular crowd-pleasers</div>
     </a>
     <a class="tile" href="#/browse?time=long" style="background:linear-gradient(160deg,#2f1f3d,#11081a);">
-      <div class="tile-emoji">🎬</div><div class="tile-name">Long Epics</div><div class="tile-sub">Settle in for the night</div>
+      <div class="tile-emoji"><i class="fa-solid fa-photo-film"></i></div><div class="tile-name">Long Epics</div><div class="tile-sub">Settle in for the night</div>
     </a>`;
 }
 function loadCollectionsTiles() {

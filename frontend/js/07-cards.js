@@ -27,7 +27,7 @@ function movieCard(movie) {
       ${movie.match_score != null ? matchRingSVG(movie.match_score) : ""}
       <div class="card-quick">
         <button class="q-fav" title="Add to favorites">${isFav ? "❤" : "♡"}</button>
-        <button class="q-watch" title="Add to watchlist">＋</button>
+        <button class="q-watch" title="Add to watchlist"><i class="fa-solid fa-plus"></i></button>
       </div>
     </div>
     <div class="card-body">

@@ -17,6 +17,8 @@
 .overlay.open {
   opacity: 1;
   pointer-events: auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--surface-strong) transparent;
 }
 .glass-panel {
   background: rgba(18, 16, 22, 0.92);
