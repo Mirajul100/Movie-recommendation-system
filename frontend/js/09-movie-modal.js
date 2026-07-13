@@ -36,14 +36,14 @@ async function openMovieModal(id) {
       <p class="detail-overview">${escapeHtml(movie.overview || "No synopsis available.")}</p>
       <div class="detail-actions">
         <button class="btn btn-primary" id="dm-fav">${isFav ? "❤ In Favorites" : "♡ Add to Favorites"}</button>
-        <button class="btn btn-ghost" id="dm-watch">＋ Watchlist</button>
-        <button class="btn btn-ghost" id="dm-share">↗ Share</button>
+        <button class="btn btn-ghost" id="dm-watch"><i class="fa-solid fa-plus"></i> Watchlist</button>
+        <button class="btn btn-ghost" id="dm-share"><i class="fa-solid fa-share"></i> Share</button>
       </div>
 
       ${
         movie.trailer_key
           ? `
-      <div class="detail-section-title">▶ Trailer</div>
+      <div class="detail-section-title"><i class="fa-solid fa-play"></i> Trailer</div>
       <div class="trailer-embed"><iframe src="https://www.youtube.com/embed/${movie.trailer_key}" allowfullscreen></iframe></div>
       `
           : ""
@@ -86,7 +86,7 @@ async function openMovieModal(id) {
         '<div style="color:var(--text-faint);font-size:13px;padding:10px 0;">No reviews yet — be the first.</div>'
       }</div>
 
-      <div class="detail-section-title">✦ Because you liked this</div>
+      <div class="detail-section-title"><i class="fa-solid fa-lightbulb"></i> Because you liked this</div>
       <div class="row-scroll" id="dm-similar" style="padding-left:0;padding-right:0;"></div>
     </div>`;
 

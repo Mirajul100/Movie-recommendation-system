@@ -70,11 +70,11 @@ async function renderBrowse(reset = true) {
   if (browseState.genre) label = browseState.genre + " Movies";
   if (browseState.mood)
     label =
-      MOOD_ICONS[browseState.mood] +
-      " " +
-      browseState.mood[0].toUpperCase() +
-      browseState.mood.slice(1) +
-      " Mood";
+    MOOD_ICONS[browseState.mood] +
+    " " +
+    browseState.mood[0].toUpperCase() +
+    browseState.mood.slice(1) +
+    " Mood";
   if (browseState.q) label = `Results for "${browseState.q}"`;
   if (browseState.time)
     label = {
@@ -82,7 +82,7 @@ async function renderBrowse(reset = true) {
       weekend: "Weekend Movies",
       long: "Long Epics",
     }[browseState.time];
-  qs("#browse-title").textContent = label;
+  qs("#browse-title").innerHTML = label;
   qs("#browse-sub").textContent = `${items.length}+ titles`;
 }
 qs("#browse-load-more").onclick = () => renderBrowse(false);
