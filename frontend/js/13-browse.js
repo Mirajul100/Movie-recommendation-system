@@ -82,7 +82,7 @@ async function renderBrowse(reset = true) {
       weekend: "Weekend Movies",
       long: "Long Epics",
     }[browseState.time];
-  qs("#browse-title").innerHTML = label;
+  qs("#browse-title").innerHTML.textContent = label;
   qs("#browse-sub").textContent = `${items.length}+ titles`;
 }
 qs("#browse-load-more").onclick = () => renderBrowse(false);
