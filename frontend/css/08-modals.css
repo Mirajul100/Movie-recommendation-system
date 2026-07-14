@@ -218,7 +218,7 @@ textarea.review-input {
 /* Auth modal */
 #auth-modal .glass-panel {
   max-width: 400px;
-  padding: 34px 30px;
+  padding: 60px 30px;
   position: relative;
 }
 .auth-tabs {
