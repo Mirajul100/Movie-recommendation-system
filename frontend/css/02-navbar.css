@@ -200,7 +200,7 @@
 .btn-ghost {
   background: transparent;
   border: 1px solid rgb(225 28 28 / 32%);
-  color: white;
+  color: var(--black);
 }
 .btn-violet {
   background: linear-gradient(135deg, var(--violet), var(--violet-dim));

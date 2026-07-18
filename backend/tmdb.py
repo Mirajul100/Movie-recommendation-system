@@ -19,6 +19,7 @@ logger = logging.getLogger(__name__)
 
 CACHE_TTL = 60 * 60 * 6        # 6 hours for genuine results (including "no match")
 ERROR_CACHE_TTL = 60           # 1 minute for errors/failures, so we retry soon
+NOW_PLAYING_CACHE_TTL = 60 * 60 * 6   # now-playing list changes daily at most
 
 _EMPTY = {
     "poster_url": None, "backdrop_url": None, "release_date": None,
@@ -166,3 +167,65 @@ async def enrich_by_title(title: str) -> dict:
     if "cast" in out and isinstance(out["cast"], list):
         out["cast"] = list(out["cast"])
     return out
+
+
+async def _fetch_now_playing(pages: int) -> Tuple[list, float]:
+    """Fetch titles currently in theaters from TMDB's now_playing endpoint.
+    Only ever invoked on a cache miss; stampede-protected the same way as
+    enrich_by_title so concurrent requests share one set of network calls."""
+    client = get_client()
+    titles: list[str] = []
+
+    async with _semaphore:
+        try:
+            for page in range(1, pages + 1):
+                resp = await client.get(
+                    f"{TMDB_BASE}/movie/now_playing",
+                    params={"language": "en-US", "page": page},
+                )
+                resp.raise_for_status()
+                data = resp.json()
+                for m in data.get("results", []):
+                    t = m.get("title")
+                    if t:
+                        titles.append(t)
+
+            logger.info("TMDB now_playing fetched %d titles across %d page(s)", len(titles), pages)
+            return titles, NOW_PLAYING_CACHE_TTL
+
+        except httpx.HTTPStatusError as e:
+            logger.warning(
+                "TMDB now_playing HTTP %s: %s",
+                e.response.status_code, e.response.text[:300],
+            )
+            return [], ERROR_CACHE_TTL
+
+        except httpx.HTTPError as e:
+            logger.warning("TMDB now_playing request failed: %s", e)
+            return [], ERROR_CACHE_TTL
+
+        except (KeyError, IndexError) as e:
+            logger.warning("TMDB now_playing response shape unexpected: %s", e)
+            return [], ERROR_CACHE_TTL
+
+
+async def get_now_playing_titles(pages: int = 2) -> list[str]:
+    """Titles of movies currently releasing/in theaters, per TMDB. Returns
+    plain title strings (not full TMDB movie objects) so the caller can
+    cross-reference against the local dataset and keep using local
+    movie_ids for detail lookups, recommendations, favorites, etc.
+
+    Returns [] if TMDB_API_KEY isn't configured or the fetch fails — callers
+    should have a fallback (e.g. trending) for that case.
+    """
+    if not TMDB_API_KEY:
+        logger.warning("TMDB_API env var is not set; skipping now_playing fetch")
+        return []
+
+    key = ("tmdb_now_playing", pages)
+
+    async def factory() -> Tuple[list, float]:
+        return await _fetch_now_playing(pages)
+
+    result = await tmdb_cache.get_or_set_variable_ttl(key, factory)
+    return list(result)

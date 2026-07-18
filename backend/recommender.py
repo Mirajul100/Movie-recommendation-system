@@ -111,6 +111,48 @@ def list_genres():
     return CANONICAL_GENRES
 
 
+def new_releases(limit: int = 10, offset: int = 0):
+    date_col = None
+    for candidate in ("release_date", "release_year", "date"):
+        if candidate in DF.columns:
+            date_col = candidate
+            break
+
+    if date_col is None:
+        return trending(limit=limit, offset=offset)
+
+    subset = DF[DF[date_col].notna() & (DF[date_col] != "")]
+    if subset.empty:
+        return trending(limit=limit, offset=offset)
+
+    result = subset.sort_values(date_col, ascending=False).iloc[offset:offset + limit]
+    return [movie_to_dict(r) for _, r in result.iterrows()]
+
+
+def new_releases_from_titles(titles: list[str], limit: int = 10, offset: int = 0):
+    """Take TMDB 'now playing' titles, keep only the ones that also exist
+    in our local dataset (so ids/detail/recommend/favorites all keep
+    working), preserving TMDB's ordering (most recently released first)."""
+    seen_idx = []
+    seen_set = set()
+    for t in titles:
+        idx = TITLE_TO_IDX.get(t)
+        if idx is not None and idx not in seen_set:
+            seen_set.add(idx)
+            seen_idx.append(idx)
+        if len(seen_idx) >= offset + limit:
+            break
+
+    page = seen_idx[offset:offset + limit]
+    if not page:
+        # Nothing in our local dataset matched TMDB's now-playing list
+        # (small/older local dataset vs. this week's theatrical releases)
+        # -- fall back to trending so the row still shows something.
+        return trending(limit=limit, offset=offset)
+
+    return [movie_to_dict(DF.iloc[i]) for i in page]
+
+
 def trending(limit: int = 20, offset: int = 0):
     result = DF.sort_values("popularity", ascending=False).iloc[offset:offset + limit]
     return [movie_to_dict(r) for _, r in result.iterrows()]

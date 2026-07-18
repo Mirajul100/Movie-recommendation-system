@@ -1,6 +1,6 @@
 /* ---------------------------- hero ----------------------------------------- */
 async function loadHero() {
-  const movie = await api("/api/trending?limit=1").then((r) => r[0]);
+  const movie = await api("/api/new-releases?limit=1").then((r) => r[0]);
   const enriched = (await enrichTitles([movie.title]))[movie.title];
   Object.assign(movie, enriched);
   if (movie.backdrop_url)

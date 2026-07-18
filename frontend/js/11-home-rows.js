@@ -5,6 +5,12 @@ async function loadHomeRows() {
 
   const sections = [
     {
+      key: "new-releases",
+      title: '<i class="fa-solid fa-clapperboard"></i> New Releases',
+      sub: "Fresh from the theaters",
+      href: "#/browse?sort=release_date",
+    },  
+    {
       key: "trending",
       title: '<i class="fa-solid fa-fire"></i> Trending Now',
       sub: "What everyone is watching",

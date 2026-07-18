@@ -16,6 +16,12 @@
 .grid .card {
   flex-basis: auto;
 }
+/* Cards inside a marquee track must never shrink or snap —
+   the track's width relies on every card staying exactly 168px */
+.row-track .card {
+  flex-shrink: 0;
+  scroll-snap-align: none;
+}
 .card:hover {
   transform: translateY(-6px) scale(1.035);
   box-shadow: 0 20px 40px rgba(0, 0, 0, 0.55);

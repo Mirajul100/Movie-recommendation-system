@@ -160,6 +160,18 @@ async def genre_movies(genre: str, limit: int = Query(24, ge=1, le=100), offset:
 
     return await listing_cache.get_or_set(("genre", genre, limit, offset), factory)
 
+@app.get("/api/new-releases")
+async def new_releases(limit: int = Query(24, ge=1, le=100), offset: int = 0):
+    async def factory():
+        titles = await tmdb.get_now_playing_titles(pages=2)
+        return rec.new_releases_from_titles(titles, limit=limit, offset=offset)
+
+    # Shorter TTL than the other listing endpoints since TMDB's now-playing
+    # data is time-sensitive and should refresh more often than static
+    # local-dataset rankings like trending/top-rated.
+    return await listing_cache.get_or_set(
+        ("new_releases", limit, offset), factory, ttl=60 * 60 * 6
+    )
 
 @app.get("/api/trending")
 async def trending(limit: int = Query(24, ge=1, le=100), offset: int = 0):

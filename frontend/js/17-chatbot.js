@@ -26,7 +26,7 @@ function showChatTyping() {
   const el = document.createElement("div");
   el.className = "chat-msg bot chat-typing";
   el.id = "chat-typing-indicator";
-  el.innerHTML = `<span></span><span></span><span></span>`;
+  el.innerHTML = `<span>.</span><span>.</span><span>.</span>`;
   qs("#chat-body").appendChild(el);
   scrollChatToBottom();
 }

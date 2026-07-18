@@ -47,7 +47,8 @@
   overflow-x: auto;
   padding: 4px clamp(16px, 4vw, 48px) 20px;
   scroll-snap-type: x proximity;
-  scrollbar-width: initial;
+  scrollbar-width: thin;
+  scrollbar-color: var(--surface-strong) transparent;
 }
 .row-scroll::-webkit-scrollbar {
   height: 6px;
